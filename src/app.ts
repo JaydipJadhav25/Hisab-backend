@@ -25,6 +25,7 @@ app.use(morgan(env.isProd ? "combined" : "dev"));
 app.get("/", (_req, res) => {
   res.json({
     message: "Backend is running",
+    url : process.env.CLIENT_ORIGIN
   });
 });
 
