@@ -18,6 +18,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(morgan(env.isProd ? "combined" : "dev"));
