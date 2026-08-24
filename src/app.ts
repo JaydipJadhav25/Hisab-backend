@@ -22,6 +22,12 @@ app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(morgan(env.isProd ? "combined" : "dev"));
 
+app.get("/", (_req, res) => {
+  res.json({
+    message: "Backend is running",
+  });
+});
+
 app.get("/api/health", (_req, res) => {
   res.status(200).json({ status: "ok", timestamp: new Date().toISOString() });
 });
