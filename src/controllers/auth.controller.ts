@@ -18,11 +18,14 @@ const cookieOptions = {
 function setAuthCookies(res: Response, userId: string) {
   const accessToken = signAccessToken(userId);
   const refreshToken = signRefreshToken(userId);
-  res.cookie("accessToken", accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
-  res.cookie("refreshToken", refreshToken, {
-    ...cookieOptions,
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-  });
+  res.cookie("accessToken", accessToken);
+  res.cookie("refreshToken", refreshToken);
+  
+  return {
+    accessToken : accessToken,
+    refreshToken : refreshToken
+  }
+
 }
 
 export const register = asyncHandler(async (req, res) => {
@@ -35,13 +38,14 @@ export const register = asyncHandler(async (req, res) => {
 export const login = asyncHandler(async (req, res) => {
   const input = loginSchema.parse(req.body);
   const user = await validateCredentials(input);
-  setAuthCookies(res, user._id.toString());
-  res.status(200).json({ user });
+ const { accessToken , refreshToken} = setAuthCookies(res, user._id.toString());
+
+  res.status(200).json({ user , accessToken , refreshToken});
 });
 
 export const logout = asyncHandler(async (_req, res) => {
-  res.clearCookie("accessToken", cookieOptions);
-  res.clearCookie("refreshToken", cookieOptions);
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
   res.status(200).json({ message: "Logged out" });
 });
 
