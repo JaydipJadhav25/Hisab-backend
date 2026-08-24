@@ -40,7 +40,7 @@ export const login = asyncHandler(async (req, res) => {
   const user = await validateCredentials(input);
  const { accessToken , refreshToken} = setAuthCookies(res, user._id.toString());
 
-  res.status(200).json({ user , accessToken , refreshToken});
+  res.status(200).json({ user , accessToken : accessToken , refreshToken : refreshToken});
 });
 
 export const logout = asyncHandler(async (_req, res) => {
