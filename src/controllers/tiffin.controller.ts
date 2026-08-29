@@ -7,6 +7,9 @@ import { todayISODate } from "../utils/date";
 
 export const selectToday = asyncHandler(async (req: GroupScopedRequest, res: Response) => {
   const input = selectTiffinSchema.parse(req.body);
+  console.log("input : " , input);
+
+  
   const record = await tiffinService.selectTodayTiffin(
     req.params.id,
     req.userId as string,
@@ -43,7 +46,9 @@ export const getTodayOrder = asyncHandler(async (req: GroupScopedRequest, res: R
 });
 
 export const getHistory = asyncHandler(async (req: GroupScopedRequest, res: Response) => {
-  const { date, userId, type } = req.query as { date?: string; userId?: string; type?: any };
-  const records = await tiffinService.getGroupHistory(req.params.id, { date, userId, type });
+  // const { date, userId, type } = req.query as { date?: string; userId?: string; type?: any };
+  console.log("reuest : " , req.userId);
+  const records = await tiffinService.getGroupHistory(req.params.id , req.userId);
+
   res.status(200).json({ records });
 });

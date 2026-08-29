@@ -13,16 +13,10 @@ import { computeGroupStatus } from "../services/group.service";
 
 export const createGroup = asyncHandler(async (req: AuthedRequest, res: Response) => {
   const input = createGroupSchema.parse(req.body);
-  console.log("log : " ,input);
-
+  console.log("input data : ", input);
   const group = await groupService.createGroup(req.userId as string, input);
-
-  console.log("group: " , group);
-
-
+  console.log("gruop :" , group);
   res.status(201).json({ group });
-
-  
 });
 
 export const listMyGroups = asyncHandler(async (req: AuthedRequest, res: Response) => {

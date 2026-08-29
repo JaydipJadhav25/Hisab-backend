@@ -31,7 +31,6 @@ export async function createGroup(ownerId: string, input: CreateGroupInput) {
     pricing: input.pricing,
     startDate: input.startDate,
     endDate,
-    cutoffTime: input.cutoffTime,
     inviteCode,
     status: "UPCOMING",
   });
@@ -68,7 +67,6 @@ export async function updateGroup(groupId: string, input: UpdateGroupInput) {
   if (input.name) group.name = input.name;
   if (input.provider) group.provider = { ...group.provider, ...input.provider };
   if (input.pricing) group.pricing = { ...group.pricing, ...input.pricing };
-  if (input.cutoffTime) group.cutoffTime = input.cutoffTime;
 
   await group.save();
   return group;

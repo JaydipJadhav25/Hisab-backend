@@ -19,38 +19,53 @@ export async function selectTodayTiffin(
 ) {
   const group = await Group.findById(groupId);
   if (!group) throw AppError.notFound("Group not found", "GROUP_NOT_FOUND");
+  // console.log("group id : " , group);
 
   const status = computeGroupStatus(group);
+  // console.log("status : " , status);
   if (status === "EXPIRED" || status === "CLOSED") {
     throw AppError.badRequest("This group has ended. New selections are not accepted.", "GROUP_EXPIRED");
   }
 
+
+
   const date = targetDate ?? todayISODate();
 
-  if (!isAdminOverride && date === todayISODate() && isPastCutoff(group.cutoffTime)) {
-    throw AppError.forbidden(
-      `Selection is locked. Today's cutoff was ${group.cutoffTime}.`,
-      "CUTOFF_PASSED"
-    );
-  }
+  // console.log("date : " , date);
+
+  // 1. Get the current hour based on system execution time
+  const currentHour = new Date().getHours(); 
+
+  // console.log("currentHour : " , currentHour);
+
+
+  // 2. Determine mode: "day" (9 AM to 5:59 PM) vs "night" (6 PM to 8:59 AM)
+  const mode = (currentHour >= 9 && currentHour < 18) ? "day" : "night";
 
   const price = priceForType(type, group.pricing);
 
-  const record = await DailyTiffinRecord.findOneAndUpdate(
-    { groupId, userId, date },
-    {
-      $set: {
-        type,
-        priceAtTime: price,
-        status: isAdminOverride ? "ADMIN_OVERRIDDEN" : "CONFIRMED",
-        confirmedAt: new Date(),
-      },
-    },
-    { upsert: true, new: true, setDefaultsOnInsert: true }
-  );
+
+ 
+
+
+  // 3. Always create a new historic entry with the mode saved
+  const record = await DailyTiffinRecord.create({
+    groupId,
+    userId,
+    date,
+    type,
+    mode, // Saves "day" or "night" into the document
+    priceAtTime: price,
+    status: isAdminOverride ? "ADMIN_OVERRIDDEN" : "CONFIRMED",
+    confirmedAt: new Date(),
+  });
+
+
 
   return record;
 }
+
+
 
 export async function getTodayRecord(groupId: string, userId: string) {
   return DailyTiffinRecord.findOne({ groupId, userId, date: todayISODate() });
@@ -70,16 +85,12 @@ export async function getGroupOrderForDate(groupId: string, date: string) {
   return { date, summary, records };
 }
 
-export async function getGroupHistory(
-  groupId: string,
-  filters: { date?: string; userId?: string; type?: TiffinType }
-) {
-  const query: Record<string, unknown> = { groupId };
-  if (filters.date) query.date = filters.date;
-  if (filters.userId) query.userId = filters.userId;
-  if (filters.type) query.type = filters.type;
+export async function getGroupHistory( groupId : any , userId : any ) {
 
-  return DailyTiffinRecord.find(query)
-    .sort({ date: -1 })
-    .populate("userId", "name profileImage");
+   const records = await DailyTiffinRecord.find({ groupId, userId });
+
+
+    // console.log("recors : " , records);
+
+    return records;
 }

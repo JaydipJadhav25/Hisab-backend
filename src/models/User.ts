@@ -1,4 +1,5 @@
 import { Schema, model, Document, Types } from "mongoose";
+import { applyIdTransform } from "../utils/toJSONPlugin";
 
 export type Language = "en" | "mr";
 
@@ -37,12 +38,6 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-userSchema.set("toJSON", {
-  transform: (_doc, ret: any) => {
-    delete ret.passwordHash;
-    delete ret.__v;
-    return ret;
-  },
-});
+applyIdTransform(userSchema, ["passwordHash"]);
 
 export const User = model<IUser>("User", userSchema);

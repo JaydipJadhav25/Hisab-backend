@@ -1,4 +1,5 @@
 import { Schema, model, Document, Types } from "mongoose";
+import { applyIdTransform } from "../utils/toJSONPlugin";
 
 export type GroupRole = "ADMIN" | "MEMBER";
 export type MemberStatus = "ACTIVE" | "REMOVED";
@@ -22,5 +23,7 @@ const groupMemberSchema = new Schema<IGroupMember>({
 
 // A user can only have one membership record per group
 groupMemberSchema.index({ groupId: 1, userId: 1 }, { unique: true });
+
+applyIdTransform(groupMemberSchema);
 
 export const GroupMember = model<IGroupMember>("GroupMember", groupMemberSchema);

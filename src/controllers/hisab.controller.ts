@@ -8,6 +8,11 @@ export const getGroupHisab = asyncHandler(async (req: GroupScopedRequest, res: R
   res.status(200).json({ hisab });
 });
 
+export const getMyHisab = asyncHandler(async (req: GroupScopedRequest, res: Response) => {
+  const hisab = await computeMemberHisab(req.params.id, req.userId as string);
+  res.status(200).json({ hisab });
+});
+
 export const getMemberHisab = asyncHandler(async (req: GroupScopedRequest, res: Response) => {
   // Members may only fetch their own hisab unless they are admin
   const targetUserId =

@@ -1,4 +1,5 @@
 import { Schema, model, Document, Types } from "mongoose";
+import { applyIdTransform } from "../utils/toJSONPlugin";
 
 export type NotificationType =
   | "SELECTION_OPEN"
@@ -41,5 +42,7 @@ const notificationSchema = new Schema<INotification>(
 );
 
 notificationSchema.index({ userId: 1, read: 1, createdAt: -1 });
+
+applyIdTransform(notificationSchema);
 
 export const Notification = model<INotification>("Notification", notificationSchema);

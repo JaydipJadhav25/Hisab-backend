@@ -1,4 +1,5 @@
 import { Schema, model, Document, Types } from "mongoose";
+import { applyIdTransform } from "../utils/toJSONPlugin";
 
 export type TiffinType = "FULL" | "HALF" | "NONE";
 export type TiffinRecordStatus = "CONFIRMED" | "LOCKED" | "ADMIN_OVERRIDDEN";
@@ -14,7 +15,9 @@ export interface IDailyTiffinRecord extends Document {
   confirmedAt: Date;
   updatedAt: Date;
   createdAt: Date;
+  mode : string;
 }
+
 
 const dailyTiffinRecordSchema = new Schema<IDailyTiffinRecord>(
   {
@@ -23,19 +26,17 @@ const dailyTiffinRecordSchema = new Schema<IDailyTiffinRecord>(
     date: { type: String, required: true }, // YYYY-MM-DD
     type: { type: String, enum: ["FULL", "HALF", "NONE"], required: true },
     priceAtTime: { type: Number, required: true, min: 0 },
-    status: {
-      type: String,
-      enum: ["CONFIRMED", "LOCKED", "ADMIN_OVERRIDDEN"],
-      default: "CONFIRMED",
-    },
+    mode : {type : String},
     confirmedAt: { type: Date, default: () => new Date() },
   },
   { timestamps: true }
 );
 
 // Rule: only one active tiffin record per member/group/date
-dailyTiffinRecordSchema.index({ groupId: 1, userId: 1, date: 1 }, { unique: true });
-dailyTiffinRecordSchema.index({ groupId: 1, date: 1 });
+// dailyTiffinRecordSchema.index({ groupId: 1, userId: 1, date: 1 }, { unique: true });
+// dailyTiffinRecordSchema.index({ groupId: 1, date: 1 });
+
+// applyIdTransform(dailyTiffinRecordSchema);
 
 export const DailyTiffinRecord = model<IDailyTiffinRecord>(
   "DailyTiffinRecord",

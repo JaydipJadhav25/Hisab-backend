@@ -5,6 +5,7 @@ import * as hisabController from "../controllers/hisab.controller";
 import * as paymentController from "../controllers/payment.controller";
 import { requireAuth } from "../middleware/requireAuth";
 import { requireGroupRole } from "../middleware/requireGroupRole";
+import { validateObjectIdParams } from "../middleware/validateObjectIdParams";
 
 const router = Router();
 
@@ -91,6 +92,7 @@ router.get("/:id/members", requireGroupRole(), groupController.listMembers);
  */
 router.delete(
   "/:id/members/:userId",
+  validateObjectIdParams("userId"),
   requireGroupRole("ADMIN"),
   groupController.removeMember
 );
@@ -177,6 +179,7 @@ router.get("/:id/tiffin/history", requireGroupRole(), tiffinController.getHistor
  */
 router.patch(
   "/:id/tiffin/:userId/override",
+  validateObjectIdParams("userId"),
   requireGroupRole("ADMIN"),
   tiffinController.overrideSelection
 );
@@ -194,6 +197,17 @@ router.get("/:id/hisab", requireGroupRole("ADMIN"), hisabController.getGroupHisa
 
 /**
  * @openapi
+ * /groups/{id}/hisab/me:
+ *   get:
+ *     summary: Get the current user's own hisab for this group
+ *     tags: [Hisab]
+ *     responses:
+ *       200: { description: My hisab }
+ */
+router.get("/:id/hisab/me", requireGroupRole(), hisabController.getMyHisab);
+
+/**
+ * @openapi
  * /groups/{id}/hisab/{userId}:
  *   get:
  *     summary: Get one member's hisab (self, or admin for anyone)
@@ -201,7 +215,12 @@ router.get("/:id/hisab", requireGroupRole("ADMIN"), hisabController.getGroupHisa
  *     responses:
  *       200: { description: Member hisab }
  */
-router.get("/:id/hisab/:userId", requireGroupRole(), hisabController.getMemberHisab);
+router.get(
+  "/:id/hisab/:userId",
+  validateObjectIdParams("userId"),
+  requireGroupRole(),
+  hisabController.getMemberHisab
+);
 
 /**
  * @openapi
@@ -222,6 +241,17 @@ router.get("/:id/payments", requireGroupRole("ADMIN"), paymentController.listPay
 
 /**
  * @openapi
+ * /groups/{id}/payments/me:
+ *   get:
+ *     summary: Get the current user's own payments for this group
+ *     tags: [Payments]
+ *     responses:
+ *       200: { description: My payments }
+ */
+router.get("/:id/payments/me", requireGroupRole(), paymentController.listMyPayments);
+
+/**
+ * @openapi
  * /groups/{id}/payments/{userId}:
  *   get:
  *     summary: List a member's payments (self, or admin for anyone)
@@ -229,6 +259,11 @@ router.get("/:id/payments", requireGroupRole("ADMIN"), paymentController.listPay
  *     responses:
  *       200: { description: Payment list }
  */
-router.get("/:id/payments/:userId", requireGroupRole(), paymentController.listMemberPayments);
+router.get(
+  "/:id/payments/:userId",
+  validateObjectIdParams("userId"),
+  requireGroupRole(),
+  paymentController.listMemberPayments
+);
 
 export default router;

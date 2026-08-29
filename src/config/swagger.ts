@@ -12,10 +12,10 @@ export const swaggerSpec = swaggerJsdoc({
     servers: [{ url: "/api", description: "API base path" }],
     components: {
       securitySchemes: {
-        cookieAuth: {
-          type: "apiKey",
-          in: "cookie",
-          name: "accessToken",
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
         },
       },
       schemas: {
@@ -55,7 +55,7 @@ export const swaggerSpec = swaggerJsdoc({
         },
       },
     },
-    security: [{ cookieAuth: [] }],
+    security: [{ bearerAuth: [] }],
   },
   apis: ["./src/routes/*.ts", "./src/docs/*.ts"],
 });

@@ -1,4 +1,5 @@
 import { Schema, model, Document, Types } from "mongoose";
+import { applyIdTransform } from "../utils/toJSONPlugin";
 
 export type GroupStatus = "ACTIVE" | "UPCOMING" | "EXPIRED" | "CLOSED";
 
@@ -31,7 +32,7 @@ const groupSchema = new Schema<IGroup>(
     ownerId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
     provider: {
       name: { type: String, required: true, trim: true },
-      phone: { type: String, required: true, trim: true },
+      phone: { type: String,  trim: true },
       address: { type: String },
       notes: { type: String },
     },
@@ -41,7 +42,6 @@ const groupSchema = new Schema<IGroup>(
     },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
-    cutoffTime: { type: String, required: true, default: "09:00" },
     status: {
       type: String,
       enum: ["ACTIVE", "UPCOMING", "EXPIRED", "CLOSED"],
@@ -51,5 +51,7 @@ const groupSchema = new Schema<IGroup>(
   },
   { timestamps: true }
 );
+
+applyIdTransform(groupSchema);
 
 export const Group = model<IGroup>("Group", groupSchema);

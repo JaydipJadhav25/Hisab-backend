@@ -1,4 +1,5 @@
 import { Schema, model, Document, Types } from "mongoose";
+import { applyIdTransform } from "../utils/toJSONPlugin";
 
 export type PaymentMethod = "CASH" | "UPI" | "BANK_TRANSFER" | "OTHER";
 
@@ -32,5 +33,7 @@ const paymentSchema = new Schema<IPayment>(
 );
 
 paymentSchema.index({ groupId: 1, userId: 1 });
+
+applyIdTransform(paymentSchema);
 
 export const Payment = model<IPayment>("Payment", paymentSchema);

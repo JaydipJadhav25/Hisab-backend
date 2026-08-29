@@ -15,6 +15,11 @@ export const listPayments = asyncHandler(async (req: GroupScopedRequest, res: Re
   res.status(200).json({ payments });
 });
 
+export const listMyPayments = asyncHandler(async (req: GroupScopedRequest, res: Response) => {
+  const payments = await paymentService.listMemberPayments(req.params.id, req.userId as string);
+  res.status(200).json({ payments });
+});
+
 export const listMemberPayments = asyncHandler(async (req: GroupScopedRequest, res: Response) => {
   const targetUserId =
     req.groupRole === "ADMIN" ? req.params.userId : (req.userId as string);
