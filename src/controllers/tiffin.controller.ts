@@ -52,3 +52,9 @@ export const getHistory = asyncHandler(async (req: GroupScopedRequest, res: Resp
 
   res.status(200).json({ records });
 });
+
+export const getCalendarSummary = asyncHandler(async (req: GroupScopedRequest, res: Response) => {
+  const month = (req.query.month as string) ?? todayISODate().slice(0, 7);
+  const days = await tiffinService.getMonthCalendarSummary(req.params.id, month);
+  res.status(200).json({ month, days });
+});

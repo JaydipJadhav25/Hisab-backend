@@ -94,3 +94,40 @@ export async function getGroupHistory( groupId : any , userId : any ) {
 
     return records;
 }
+
+
+export interface DayCalendarSummary {
+  date: string; // YYYY-MM-DD
+  full: number;
+  half: number;
+  none: number;
+  responded: number;
+}
+
+/**
+ * One row per date-with-at-least-one-record, for a given month, used to
+ * draw badges on the calendar. `month` is "YYYY-MM".
+ */
+export async function getMonthCalendarSummary(
+  groupId: string,
+  month: string
+): Promise<DayCalendarSummary[]> {
+  const prefix = month; // "YYYY-MM" is a valid prefix of "YYYY-MM-DD"
+  const records = await DailyTiffinRecord.find({
+    groupId,
+    date: { $regex: `^${prefix}` },
+  });
+
+  const byDate = new Map<string, DayCalendarSummary>();
+  for (const r of records) {
+    const existing =
+      byDate.get(r.date) ?? { date: r.date, full: 0, half: 0, none: 0, responded: 0 };
+    if (r.type === "FULL") existing.full += 1;
+    else if (r.type === "HALF") existing.half += 1;
+    else existing.none += 1;
+    existing.responded += 1;
+    byDate.set(r.date, existing);
+  }
+
+  return Array.from(byDate.values()).sort((a, b) => a.date.localeCompare(b.date));
+}

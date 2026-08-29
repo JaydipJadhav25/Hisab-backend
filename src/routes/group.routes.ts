@@ -266,4 +266,12 @@ router.get(
   paymentController.listMemberPayments
 );
 
+
+
+
+
+
+router.get("/:id/tiffin/calendar", requireGroupRole(), tiffinController.getCalendarSummary);
+
+
 export default router;
